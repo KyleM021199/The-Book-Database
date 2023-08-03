@@ -6,6 +6,7 @@ import {
   Row,
   Col
 } from 'react-bootstrap';
+import {useQuery} from '@apollo/creater'
 
 import { getMe, deleteBook } from '../utils/API';
 import Auth from '../utils/auth';
@@ -17,7 +18,7 @@ const SavedBooks = () => {
   // use this to determine if `useEffect()` hook needs to run again
   const userDataLength = Object.keys(userData).length;
 
-  useEffect(() => {
+  useQuery(() => {
     const getUserData = async () => {
       try {
         const token = Auth.loggedIn() ? Auth.getToken() : null;
