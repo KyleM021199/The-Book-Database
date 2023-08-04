@@ -3,8 +3,14 @@ const { signToken, AuthenticationError } = require('../utils/auth');
 
 const resolvers = {
     Query: {
-        user: async (parent,{_id}) =>{
-            return User.findOne({_id});
+        user: async (parent,{user = null, params}) =>{
+            const foundUser = await User.findOne({
+                $or: [{ _id: user ? user._id : params.id }, { username: params.username }],
+              });
+              if (!foundUser) {
+                return res.status(400).json({ message: 'Cannot find a user with this id!' });
+              }
+              return foundUser
         },  
     },
 
@@ -12,7 +18,7 @@ const resolvers = {
         login: async(parent, {email, password}) =>{
             const user = await User.findOne({email, password})
             if(!user){
-                throw AuthenticationError;
+                return res.status(400).json({ message: "Can't find this user" });
                 }
                 const correctPw = await user.isCorrectPassword(password);
     
@@ -30,16 +36,29 @@ const resolvers = {
             const token = signToken(user)
             return {user, token};
         },
-        saveBook: async(parent, {authors, des}) =>{
-
+        saveBook: async(parent, {user, body}) =>{
+            try {
+                const updatedUser = await User.findOneAndUpdate(
+                  { _id: user._id },
+                  { $addToSet: { savedBooks: body } },
+                  { new: true, runValidators: true }
+                );
+                return updatedUser;
+              } catch (err) {
+                console.log(err);
+                return res.status(400).json(err);
+              }
         },
-        removeBook:async(parent, {bookId}) =>{
+        removeBook: async(parent, { user, params}) =>{
             const updatedUser = await User.findOneAndUpdate(
                 { _id: user._id },
-                { $pull: { savedBooks: { bookId: params.bookId } } },
+                { $pull: { savedBooks: { bookId: params.bookId  } } },
                 { new: true }
               );
-              return
+              if (!updatedUser) {
+                return res.status(404).json({ message: "Couldn't find user with this id!" });
+              }
+              return updatedUser
         }
 
     },
