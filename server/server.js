@@ -4,7 +4,7 @@ const { expressMiddleware } = require('@apollo/server/express4');
 const path = require('path');
 const { authMiddleware } = require('./utils/auth');
 const db = require('./config/connection');
-const routes = require('./routes');
+//const routes = require('./routes');
 const { typeDefs, resolvers } = require('./schemas');
 
 const app = express();
@@ -20,7 +20,7 @@ const startApolloServer = async () => {
   app.use(express.json());
 
   app.use('/graphql', expressMiddleware(server, {
-    context: authMiddleware
+    //context: authMiddleware
   }));
 
   if (process.env.NODE_ENV === 'production') {
