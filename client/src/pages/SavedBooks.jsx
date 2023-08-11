@@ -6,7 +6,7 @@ import {
   Row,
   Col
 } from 'react-bootstrap';
-import { useMutation } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 
 import { getMe, deleteBook } from '../utils/API';
 import { REMOVE_BOOK } from '../utils/mutations';
@@ -19,7 +19,7 @@ const SavedBooks = () => {
 
   const [deletingBook] = useMutation(REMOVE_BOOK);
   
-  const [gettingUser] = useMutation(GET_ME);
+  const [gettingUser] = useQuery(GET_ME);
   // use this to determine if `useEffect()` hook needs to run again
   const userDataLength = Object.keys(userData).length;
 
